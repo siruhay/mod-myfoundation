@@ -10,7 +10,7 @@ use Module\System\Traits\HasPageSetup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MyFoundationCommunity extends Model
+class MyFoundationOfficial extends Model
 {
     use Filterable;
     use HasMeta;
@@ -30,14 +30,14 @@ class MyFoundationCommunity extends Model
      *
      * @var string
      */
-    protected $table = 'foundation_communities';
+    protected $table = 'foundation_officials';
 
     /**
      * The roles variable
      *
      * @var array
      */
-    protected $roles = ['myfoundation-community'];
+    protected $roles = ['myfoundation-official'];
 
     /**
      * The model store method

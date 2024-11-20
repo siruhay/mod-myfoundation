@@ -3,10 +3,35 @@
 namespace Module\MyFoundation\Models;
 
 use Illuminate\Http\Request;
+use Module\System\Traits\HasMeta;
+use Module\System\Traits\Filterable;
+use Module\System\Traits\Searchable;
+use Module\System\Traits\HasPageSetup;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MyFoundationMember extends Model
 {
+    use Filterable;
+    use HasMeta;
+    use HasPageSetup;
+    use Searchable;
+    use SoftDeletes;
+
+    /**
+     * The connection name for the model.
+     *
+     * @var string|null
+     */
+    protected $connection = 'platform';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'foundation_members';
+
     /**
      * The roles variable
      *
