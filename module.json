@@ -5,7 +5,7 @@
     "connection": "platform",
     "name": "MyFoundation",
     "namespace": "Module",
-    "priority": 0,
+    "priority": 4,
     "disabled": false,
     "providers": "Module\\MyFoundation\\Providers\\MyFoundationServiceProvider"   
 }
