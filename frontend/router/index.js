@@ -66,6 +66,52 @@ export default {
 			],
 		},
 
+		// community
+		{
+			path: "community/:community/member",
+			component: () =>
+				import(
+					/* webpackChunkName: "myfoundation" */ "@modules/myfoundation/frontend/pages/community-member/index.vue"
+				),
+			children: [
+				{
+					path: "",
+					name: "myfoundation-member",
+					component: () =>
+						import(
+							/* webpackChunkName: "myfoundation" */ "@modules/myfoundation/frontend/pages/community-member/crud/data.vue"
+						),
+				},
+
+				{
+					path: "create",
+					name: "myfoundation-member-create",
+					component: () =>
+						import(
+							/* webpackChunkName: "myfoundation" */ "@modules/myfoundation/frontend/pages/community-member/crud/create.vue"
+						),
+				},
+
+				{
+					path: ":member/edit",
+					name: "myfoundation-member-edit",
+					component: () =>
+						import(
+							/* webpackChunkName: "myfoundation" */ "@modules/myfoundation/frontend/pages/community-member/crud/edit.vue"
+						),
+				},
+
+				{
+					path: ":member/show",
+					name: "myfoundation-member-show",
+					component: () =>
+						import(
+							/* webpackChunkName: "myfoundation" */ "@modules/myfoundation/frontend/pages/community-member/crud/show.vue"
+						),
+				},
+			],
+		},
+
 		// official
 		{
 			path: "official",

@@ -21,7 +21,8 @@ class MyFoundationCommunityController extends Controller
         Gate::authorize('view', MyFoundationCommunity::class);
 
         return new CommunityCollection(
-            MyFoundationCommunity::applyMode($request->mode)
+            MyFoundationCommunity::forCurrentUser($request->user())
+                ->applyMode($request->mode)
                 ->filter($request->filters)
                 ->search($request->findBy)
                 ->sortBy($request->sortBy)

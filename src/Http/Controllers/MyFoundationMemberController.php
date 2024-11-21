@@ -3,6 +3,7 @@
 namespace Module\MyFoundation\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use Module\MyFoundation\Models\MyFoundationMember;
@@ -15,16 +16,19 @@ class MyFoundationMemberController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  \Module\MyFoundation\Models\MyFoundationCommunity $myfoundationCommunity
+     * @param  \Module\MyFoundation\Models\MyFoundationCommunity $myFoundationCommunity
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, MyFoundationCommunity $myfoundationCommunity)
+    public function index(Request $request, MyFoundationCommunity $myFoundationCommunity)
     {
         Gate::authorize('view', MyFoundationMember::class);
 
+        Log::info($myFoundationCommunity);
+
         return new MemberCollection(
-            $myfoundationCommunity
+            $myFoundationCommunity
                 ->members()
+                ->with(['position'])
                 ->applyMode($request->mode)
                 ->filter($request->filters)
                 ->search($request->findBy)
@@ -37,26 +41,26 @@ class MyFoundationMemberController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  \Module\MyFoundation\Models\MyFoundationCommunity $myfoundationCommunity
+     * @param  \Module\MyFoundation\Models\MyFoundationCommunity $myFoundationCommunity
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, MyFoundationCommunity $myfoundationCommunity)
+    public function store(Request $request, MyFoundationCommunity $myFoundationCommunity)
     {
         Gate::authorize('create', MyFoundationMember::class);
 
         $request->validate([]);
 
-        return MyFoundationMember::storeRecord($request, $myfoundationCommunity);
+        return MyFoundationMember::storeRecord($request, $myFoundationCommunity);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \Module\MyFoundation\Models\MyFoundationCommunity $myfoundationCommunity
+     * @param  \Module\MyFoundation\Models\MyFoundationCommunity $myFoundationCommunity
      * @param  \Module\MyFoundation\Models\MyFoundationMember $myFoundationMember
      * @return \Illuminate\Http\Response
      */
-    public function show(MyFoundationCommunity $myfoundationCommunity, MyFoundationMember $myFoundationMember)
+    public function show(MyFoundationCommunity $myFoundationCommunity, MyFoundationMember $myFoundationMember)
     {
         Gate::authorize('show', $myFoundationMember);
 
@@ -67,11 +71,11 @@ class MyFoundationMemberController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  \Module\MyFoundation\Models\MyFoundationCommunity $myfoundationCommunity
+     * @param  \Module\MyFoundation\Models\MyFoundationCommunity $myFoundationCommunity
      * @param  \Module\MyFoundation\Models\MyFoundationMember $myFoundationMember
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, MyFoundationCommunity $myfoundationCommunity, MyFoundationMember $myFoundationMember)
+    public function update(Request $request, MyFoundationCommunity $myFoundationCommunity, MyFoundationMember $myFoundationMember)
     {
         Gate::authorize('update', $myFoundationMember);
 
@@ -83,11 +87,11 @@ class MyFoundationMemberController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \Module\MyFoundation\Models\MyFoundationCommunity $myfoundationCommunity
+     * @param  \Module\MyFoundation\Models\MyFoundationCommunity $myFoundationCommunity
      * @param  \Module\MyFoundation\Models\MyFoundationMember $myFoundationMember
      * @return \Illuminate\Http\Response
      */
-    public function destroy(MyFoundationCommunity $myfoundationCommunity, MyFoundationMember $myFoundationMember)
+    public function destroy(MyFoundationCommunity $myFoundationCommunity, MyFoundationMember $myFoundationMember)
     {
         Gate::authorize('delete', $myFoundationMember);
 
@@ -100,7 +104,7 @@ class MyFoundationMemberController extends Controller
      * @param  \Module\MyFoundation\Models\MyFoundationMember $myFoundationMember
      * @return \Illuminate\Http\Response
      */
-    public function restore(MyFoundationCommunity $myfoundationCommunity, MyFoundationMember $myFoundationMember)
+    public function restore(MyFoundationCommunity $myFoundationCommunity, MyFoundationMember $myFoundationMember)
     {
         Gate::authorize('restore', $myFoundationMember);
 
@@ -113,7 +117,7 @@ class MyFoundationMemberController extends Controller
      * @param  \Module\MyFoundation\Models\MyFoundationMember $myFoundationMember
      * @return \Illuminate\Http\Response
      */
-    public function forceDelete(MyFoundationCommunity $myfoundationCommunity, MyFoundationMember $myFoundationMember)
+    public function forceDelete(MyFoundationCommunity $myFoundationCommunity, MyFoundationMember $myFoundationMember)
     {
         Gate::authorize('destroy', $myFoundationMember);
 
