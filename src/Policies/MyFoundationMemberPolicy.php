@@ -9,14 +9,14 @@ use Illuminate\Auth\Access\Response;
 class MyFoundationMemberPolicy
 {
     /**
-    * Perform pre-authorization checks.
-    */
+     * Perform pre-authorization checks.
+     */
     public function before(SystemUser $user, string $ability): bool|null
     {
         if ($user->hasLicenseAs('myfoundation-superadmin')) {
             return true;
         }
-    
+
         return null;
     }
 
