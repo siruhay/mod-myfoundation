@@ -4,15 +4,19 @@ namespace Module\MyFoundation\Models;
 
 use Illuminate\Http\Request;
 use Module\System\Traits\HasMeta;
+use Illuminate\Support\Facades\DB;
+use Module\System\Models\SystemUser;
 use Module\System\Traits\Filterable;
 use Module\System\Traits\Searchable;
 use Module\System\Traits\HasPageSetup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Module\Foundation\Models\FoundationGender;
-use Module\Foundation\Models\FoundationPosition;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Module\Foundation\Models\FoundationMember;
+use Module\Foundation\Models\FoundationPosition;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Module\MyFoundation\Http\Resources\MemberResource;
 
 class MyFoundationMember extends Model
 {
@@ -142,7 +146,17 @@ class MyFoundationMember extends Model
     }
 
     /**
-     * Undocumented function
+     * user function
+     *
+     * @return MorphOne
+     */
+    public function user(): MorphOne
+    {
+        return $this->morphOne(SystemUser::class, 'userable');
+    }
+
+    /**
+     * position function
      *
      * @return BelongsTo
      */
@@ -169,9 +183,9 @@ class MyFoundationMember extends Model
      * @param [type] $model
      * @return void
      */
-    public static function updateRecord(Request $request, $model)
+    public static function updateRecord(Request $request, $model, $parent)
     {
-        //
+        return FoundationMember::updateRecord($request, $model, $parent);
     }
 
     /**
@@ -182,7 +196,22 @@ class MyFoundationMember extends Model
      */
     public static function deleteRecord($model)
     {
-        //
+        DB::connection($model->connection)->beginTransaction();
+
+        try {
+            $model->forceDelete();
+
+            DB::connection($model->connection)->commit();
+
+            return new MemberResource($model);
+        } catch (\Exception $e) {
+            DB::connection($model->connection)->rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

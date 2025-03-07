@@ -76,6 +76,24 @@ class MyFoundationCommunity extends Model
     }
 
     /**
+     * mapStatuses function
+     *
+     * @param Request $request
+     * @return array
+     */
+    public static function mapStatuses(Request $request): array
+    {
+        return [
+            'canCreate' => false,
+            'canEdit' => true,
+            'canUpdate' => true,
+            'canDelete' => false,
+            'canRestore' => false,
+            'canDestroy' => false,
+        ];
+    }
+
+    /**
      * mapResourceShow function
      *
      * @param Request $request

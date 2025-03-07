@@ -81,7 +81,7 @@ class MyFoundationMemberController extends Controller
 
         $request->validate([]);
 
-        return MyFoundationMember::updateRecord($request, $myFoundationMember);
+        return MyFoundationMember::updateRecord($request, $myFoundationMember, $myFoundationCommunity);
     }
 
     /**
