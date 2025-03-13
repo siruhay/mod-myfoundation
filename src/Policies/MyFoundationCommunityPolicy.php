@@ -16,7 +16,7 @@ class MyFoundationCommunityPolicy
         if ($user->hasLicenseAs('myfoundation-superadmin')) {
             return true;
         }
-    
+
         return null;
     }
 
@@ -50,6 +50,14 @@ class MyFoundationCommunityPolicy
     public function update(SystemUser $user, MyFoundationCommunity $myFoundationCommunity): bool
     {
         return $user->hasPermission('update-myfoundation-community');
+    }
+
+    /**
+     * Determine whether the user can upload the model.
+     */
+    public function upload(SystemUser $user, MyFoundationCommunity $myFoundationCommunity): bool
+    {
+        return $myFoundationCommunity->official_id === $user->userable->id && $user->hasPermission('update-myfoundation-community');
     }
 
     /**

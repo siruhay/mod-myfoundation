@@ -112,4 +112,20 @@ class MyFoundationCommunityController extends Controller
 
         return MyFoundationCommunity::destroyRecord($myFoundationCommunity);
     }
+
+    /**
+     * upload function
+     *
+     * @param Request $request
+     * @param MyFoundationCommunity $myFoundationCommunity
+     * @return void
+     */
+    public function upload(Request $request, MyFoundationCommunity $myFoundationCommunity)
+    {
+        Gate::authorize('upload', $myFoundationCommunity);
+
+        $request->validate([]);
+
+        return MyFoundationCommunity::uploadRecord($request, $myFoundationCommunity);
+    }
 }

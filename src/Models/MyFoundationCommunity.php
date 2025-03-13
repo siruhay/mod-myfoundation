@@ -107,6 +107,7 @@ class MyFoundationCommunity extends Model
             'communitymap_id'   => $model->communitymap_id,
             'subdistrict_id'    => $model->subdistrict_id,
             'village_id'        => $model->village_id,
+            'file'              => $model->file
         ];
     }
 
@@ -185,6 +186,18 @@ class MyFoundationCommunity extends Model
      * @return void
      */
     public static function destroyRecord($model)
+    {
+        //
+    }
+
+    /**
+     * The model upload method
+     *
+     * @param Request $request
+     * @param [type] $model
+     * @return void
+     */
+    public static function uploadRecord(Request $request, $model)
     {
         //
     }
