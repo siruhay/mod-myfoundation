@@ -9,14 +9,16 @@ use Module\System\Traits\Searchable;
 use Module\System\Traits\HasPageSetup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Module\Reference\Models\ReferenceVillage;
+use Module\Foundation\Models\FoundationMember;
 use Module\Foundation\Models\FoundationVillage;
+use Module\Reference\Models\ReferenceSubdistrict;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Module\Foundation\Models\FoundationSubdistrict;
 use Module\Foundation\Models\FoundationCommunitymap;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Module\Reference\Models\ReferenceSubdistrict;
-use Module\Reference\Models\ReferenceVillage;
 
 class MyFoundationCommunity extends Model
 {
@@ -186,11 +188,11 @@ class MyFoundationCommunity extends Model
     /**
      * members function
      *
-     * @return MorphMany
+     * @return HasMany
      */
-    public function members(): MorphMany
+    public function members(): HasMany
     {
-        return $this->morphMany(MyFoundationMember::class, 'workunitable');
+        return $this->hasMany(FoundationMember::class, 'workunitable_id');
     }
 
     /**

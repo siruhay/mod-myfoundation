@@ -74,7 +74,9 @@ class MyFoundationMember extends Model
     protected static function booted(): void
     {
         static::addGlobalScope('official', function (Builder $builder) {
-            $builder->where('type', 'LKD');
+            $builder
+                ->where('workunitable_type', 'Module\Foundation\Models\FoundationCommunity')
+                ->where('type', 'LKD');
         });
     }
 
