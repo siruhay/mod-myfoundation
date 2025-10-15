@@ -1,6 +1,6 @@
 <template>
 	<form-create with-helpdesk>
-		<template v-slot:default="{ combos: { genders, positions }, record }">
+		<template v-slot:default="{ combos: { genders, positions, scopes }, record }">
 			<v-card-text>
 				<v-row dense>
 					<v-col cols="12">
@@ -59,6 +59,15 @@
 							v-model="record.neighborhood"
 							hide-details
 						></v-text-field>
+					</v-col>
+
+					<v-col cols="12">
+						<v-select
+							:items="scopes"
+							label="Bidang Standar Pelayanan Minimal (SPM)"
+							v-model="record.scope"
+							hide-details
+						></v-select>
 					</v-col>
 				</v-row>
 			</v-card-text>

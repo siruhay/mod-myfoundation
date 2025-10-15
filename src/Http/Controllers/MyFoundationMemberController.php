@@ -28,7 +28,7 @@ class MyFoundationMemberController extends Controller
         return new MemberCollection(
             $myFoundationCommunity
                 ->members()
-                ->with(['position'])
+                ->with(['position', 'service'])
                 ->applyMode($request->mode)
                 ->filter($request->filters)
                 ->search($request->findBy)

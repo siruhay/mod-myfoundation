@@ -10,10 +10,13 @@ use Module\System\Traits\Filterable;
 use Module\System\Traits\Searchable;
 use Module\System\Traits\HasPageSetup;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Module\Posyandu\Models\PosyanduService;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Module\Foundation\Models\FoundationGender;
 use Module\Foundation\Models\FoundationMember;
 use Module\Foundation\Models\FoundationPosition;
+use Module\Foundation\Models\FoundationCommunity;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Module\MyFoundation\Http\Resources\MemberResource;
@@ -38,7 +41,7 @@ class MyFoundationMember extends Model
      *
      * @var string
      */
-    protected $table = 'foundation_members';
+    protected $table = 'foundation_biodatas';
 
     /**
      * The roles variable
@@ -64,6 +67,18 @@ class MyFoundationMember extends Model
     protected $defaultOrder = 'name';
 
     /**
+     * addGlobalScope function
+     *
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope('official', function (Builder $builder) {
+            $builder->where('type', 'LKD');
+        });
+    }
+
+    /**
      * mapCombos function
      *
      * @param Request $request
@@ -71,9 +86,12 @@ class MyFoundationMember extends Model
      */
     public static function mapCombos(Request $request): array
     {
+        $community = FoundationCommunity::find($request->segment(4));
+
         return [
+            'scopes' => PosyanduService::forCombo(),
             'genders' => FoundationGender::forCombo(),
-            'positions' => FoundationPosition::where('scope', 'MEMBER')->forCombo()
+            'positions' => $community->positions()->orderBy('_lft')->forCombo()
         ];
     }
 
@@ -98,6 +116,7 @@ class MyFoundationMember extends Model
             ['title' => 'Nama', 'value' => 'name'],
             ['title' => 'N.I.K', 'value' => 'slug'],
             ['title' => 'Jabatan', 'value' => 'position'],
+            ['title' => 'S.P.M', 'value' => 'scope'],
             ['title' => 'Updated', 'value' => 'updated_at', 'sortable' => false, 'width' => '170'],
         ];
     }
@@ -115,6 +134,7 @@ class MyFoundationMember extends Model
             'name' => $model->name,
             'slug' => $model->slug,
             'position' => $model->position->name,
+            'scope' => optional($model->service)->name,
 
             'subtitle' => (string) $model->updated_at,
             'updated_at' => (string) $model->updated_at,
@@ -138,10 +158,10 @@ class MyFoundationMember extends Model
             'village_id' => $model->village_id,
             'subdistrict_id' => $model->subdistrict_id,
             'regency_id' => $model->regency_id,
-            'community_id' => $model->community_id,
             'communitymap_id' => $model->communitymap_id,
             'citizen' => $model->citizen,
             'neighborhood' => $model->neighborhood,
+            'scope' => $model->scope,
         ];
     }
 
@@ -163,6 +183,16 @@ class MyFoundationMember extends Model
     public function position(): BelongsTo
     {
         return $this->belongsTo(FoundationPosition::class, 'position_id');
+    }
+
+    /**
+     * service function
+     *
+     * @return BelongsTo
+     */
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(PosyanduService::class, 'scope');
     }
 
     /**

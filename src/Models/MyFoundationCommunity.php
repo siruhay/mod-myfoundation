@@ -9,11 +9,14 @@ use Module\System\Traits\Searchable;
 use Module\System\Traits\HasPageSetup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Module\Foundation\Models\FoundationVillage;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Module\Foundation\Models\FoundationSubdistrict;
 use Module\Foundation\Models\FoundationCommunitymap;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Module\Reference\Models\ReferenceSubdistrict;
+use Module\Reference\Models\ReferenceVillage;
 
 class MyFoundationCommunity extends Model
 {
@@ -61,6 +64,32 @@ class MyFoundationCommunity extends Model
     protected $defaultOrder = 'name';
 
     /**
+     * mapHeaders function
+     *
+     * readonly value?: SelectItemKey<any>
+     * readonly title?: string | undefined
+     * readonly align?: 'start' | 'end' | 'center' | undefined
+     * readonly width?: string | number | undefined
+     * readonly minWidth?: string | undefined
+     * readonly maxWidth?: string | undefined
+     * readonly nowrap?: boolean | undefined
+     * readonly sortable?: boolean | undefined
+     *
+     * @param Request $request
+     * @return array
+     */
+    public static function mapHeaders(Request $request): array
+    {
+        return [
+            ['title' => 'Name', 'value' => 'name'],
+            ['title' => 'Jenis', 'value' => 'communitymap_name'],
+            ['title' => 'Kecamatan', 'value' => 'subdistrict_name'],
+            ['title' => 'Desa/Keluran', 'value' => 'village_name'],
+            ['title' => 'Updated', 'value' => 'updated_at', 'sortable' => false, 'width' => '170'],
+        ];
+    }
+
+    /**
      * mapCombos function
      *
      * @param Request $request
@@ -70,8 +99,8 @@ class MyFoundationCommunity extends Model
     {
         return [
             'communitymaps' => FoundationCommunitymap::forCombo(),
-            'subdistricts' => FoundationSubdistrict::where('regency_id', 3)->forCombo(),
-            'villages' => optional($model)->subdistrict_id ? FoundationVillage::where('district_id', $model->subdistrict_id)->forCombo() : [],
+            'subdistricts'  => FoundationSubdistrict::where('regency_id', 3)->forCombo(),
+            'villages'      => optional($model)->subdistrict_id ? FoundationVillage::where('district_id', $model->subdistrict_id)->forCombo() : [],
         ];
     }
 
@@ -84,12 +113,31 @@ class MyFoundationCommunity extends Model
     public static function mapStatuses(Request $request): array
     {
         return [
-            'canCreate' => false,
-            'canEdit' => true,
-            'canUpdate' => true,
-            'canDelete' => false,
-            'canRestore' => false,
-            'canDestroy' => false,
+            'canCreate'     => false,
+            'canEdit'       => true,
+            'canUpdate'     => true,
+            'canDelete'     => false,
+            'canRestore'    => false,
+            'canDestroy'    => false,
+        ];
+    }
+
+    /**
+     * mapResource function
+     *
+     * @param Request $request
+     * @return array
+     */
+    public static function mapResource(Request $request, $model): array
+    {
+        return [
+            'id'                => $model->id,
+            'name'              => $model->name,
+            'communitymap_name' => optional($model->communitymap)->name,
+            'subdistrict_name'  => optional($model->subdistrict)->name,
+            'village_name'      => optional($model->village)->name,
+            'subtitle'          => (string) $model->updated_at,
+            'updated_at'        => (string) $model->updated_at,
         ];
     }
 
@@ -102,17 +150,18 @@ class MyFoundationCommunity extends Model
     public static function mapResourceShow(Request $request, $model): array
     {
         return [
-            'id'                => $model->id,
-            'name'              => $model->name,
-            'communitymap_id'   => $model->communitymap_id,
-            'subdistrict_id'    => $model->subdistrict_id,
-            'village_id'        => $model->village_id,
-            'file'              => $model->file
+            'id'                    => $model->id,
+            'name'                  => $model->name,
+            'communitymap_id'       => $model->communitymap_id,
+            'communitymap_name'     => optional($model->communitymap)->id,
+            'subdistrict_id'        => $model->subdistrict_id,
+            'village_id'            => $model->village_id,
+            'file'                  => $model->file
         ];
     }
 
     /**
-     * Undocumented function
+     * scopeForCurrentUser function
      *
      * @param Builder $query
      * @param [type] $user
@@ -121,17 +170,47 @@ class MyFoundationCommunity extends Model
     public function scopeForCurrentUser(Builder $query, $user)
     {
         return $query
-            ->where('id', $user->userable->community_id);
+            ->where('id', $user->userable->workunitable_id);
     }
 
     /**
-     * Undocumented function
+     * communitymap function
      *
-     * @return HasMany
+     * @return BelongsTo
      */
-    public function members(): HasMany
+    public function communitymap(): BelongsTo
     {
-        return $this->hasMany(MyFoundationMember::class, 'community_id');
+        return $this->belongsTo(FoundationCommunitymap::class, 'communitymap_id');
+    }
+
+    /**
+     * members function
+     *
+     * @return MorphMany
+     */
+    public function members(): MorphMany
+    {
+        return $this->morphMany(MyFoundationMember::class, 'workunitable');
+    }
+
+    /**
+     * subdistrict function
+     *
+     * @return BelongsTo
+     */
+    public function subdistrict(): BelongsTo
+    {
+        return $this->belongsTo(ReferenceSubdistrict::class, 'subdistrict_id');
+    }
+
+    /**
+     * village function
+     *
+     * @return BelongsTo
+     */
+    public function village(): BelongsTo
+    {
+        return $this->belongsTo(ReferenceVillage::class, 'village_id');
     }
 
     /**
